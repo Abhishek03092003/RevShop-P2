@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RevShop – Architecture & ERD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #F0F4F8; color: #0F172A; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 48px; }
+  .header h1 { font-size: 2.4rem; font-weight: 900; color: #1E2761; margin-bottom: 8px; }
+  .header p { font-size: 1rem; color: #64748B; }
+
+  h2.sec { font-size: 1.4rem; font-weight: 800; color: #1E2761; text-align: center; margin-bottom: 32px;
+    padding-bottom: 12px; border-bottom: 3px solid #028090; }
+
+  /* ══════════════════════════════════
+     ARCHITECTURE DIAGRAM
+  ══════════════════════════════════ */
+  .arch-section { background: white; border-radius: 20px; padding: 40px; margin-bottom: 48px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+
+  .arch-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+  /* Users row */
+  .users-row { display: flex; gap: 24px; justify-content: center; margin-bottom: 8px; }
+  .user-box { background: #E0F7F4; border: 2px solid #028090; border-radius: 12px;
+    padding: 12px 28px; font-weight: 700; font-size: .9rem; color: #028090; text-align: center; }
+  .user-box span { display: block; font-size: .75rem; font-weight: 400; color: #64748B; margin-top: 2px; }
+
+  /* Arrow */
+  .arrow { display: flex; flex-direction: column; align-items: center; margin: 0; }
+  .arrow-line { width: 2px; height: 24px; background: #CBD5E1; }
+  .arrow-head { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 8px solid #CBD5E1; }
+
+  /* Layer boxes */
+  .layer { width: 100%; max-width: 800px; border-radius: 14px; padding: 16px 24px; text-align: center; margin: 0; }
+  .layer .layer-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+  .layer .layer-desc { font-size: .85rem; color: #475569; }
+  .layer .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 8px; }
+  .tag { padding: 3px 10px; border-radius: 99px; font-size: .74rem; font-weight: 600; }
+
+  .l-frontend { background: #EFF6FF; border: 2px solid #3B82F6; }
+  .l-frontend .layer-title { color: #1D4ED8; }
+  .l-frontend .tag { background: #DBEAFE; color: #1D4ED8; }
+
+  .l-controller { background: #F0FDF4; border: 2px solid #22C55E; }
+  .l-controller .layer-title { color: #15803D; }
+  .l-controller .tag { background: #DCFCE7; color: #15803D; }
+
+  .l-service { background: #FFF7ED; border: 2px solid #F97316; }
+  .l-service .layer-title { color: #C2410C; }
+  .l-service .tag { background: #FFEDD5; color: #C2410C; }
+
+  .l-repo { background: #FDF4FF; border: 2px solid #A855F7; }
+  .l-repo .layer-title { color: #7E22CE; }
+  .l-repo .tag { background: #F3E8FF; color: #7E22CE; }
+
+  .l-db { background: #FFF1F2; border: 2px solid #F43F5E; }
+  .l-db .layer-title { color: #BE123C; }
+  .l-db .tag { background: #FFE4E6; color: #BE123C; }
+
+  /* cross section */
+  .cross-row { display: flex; gap: 16px; justify-content: center; margin: 24px 0; flex-wrap: wrap; }
+  .cross-box { background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px;
+    padding: 12px 18px; text-align: center; min-width: 130px; }
+  .cross-box .cb-icon { font-size: 1.4rem; margin-bottom: 4px; }
+  .cross-box .cb-title { font-size: .78rem; font-weight: 700; color: #1E2761; }
+  .cross-box .cb-sub { font-size: .72rem; color: #64748B; margin-top: 2px; }
+
+  /* ══════════════════════════════════
+     ERD
+  ══════════════════════════════════ */
+  .erd-section { background: white; border-radius: 20px; padding: 40px; margin-bottom: 48px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+
+  .erd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+  .erd-table { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .erd-header { padding: 10px 14px; font-weight: 800; font-size: .9rem; color: white; text-align: center; }
+  .erd-body { background: white; }
+  .erd-row { display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 14px; border-bottom: 1px solid #F1F5F9; font-size: .78rem; }
+  .erd-row:last-child { border-bottom: none; }
+  .erd-row .col-name { color: #1E293B; font-weight: 500; }
+  .erd-row .col-type { color: #94A3B8; font-size: .72rem; }
+  .pk { color: #F59E0B !important; font-weight: 700 !important; }
+  .fk { color: #3B82F6 !important; }
+
+  /* entity colors */
+  .e-user     { background: #1E2761; }
+  .e-product  { background: #028090; }
+  .e-category { background: #065A82; }
+  .e-cart     { background: #019875; }
+  .e-cartitem { background: #02C39A; }
+  .e-order    { background: #7C3AED; }
+  .e-orderitem{ background: #9333EA; }
+  .e-payment  { background: #DC2626; }
+  .e-review   { background: #D97706; }
+  .e-favorite { background: #DB2777; }
+  .e-notif    { background: #0284C7; }
+  .e-secq     { background: #475569; }
+  .e-prodimg  { background: #059669; }
+
+  /* RELATIONSHIPS */
+  .rel-section { background: white; border-radius: 20px; padding: 40px; margin-bottom: 48px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .rel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .rel-row { display: flex; align-items: center; gap: 12px; background: #F8FAFC;
+    border-radius: 10px; padding: 12px 16px; }
+  .rel-entity { font-size: .82rem; font-weight: 700; color: #1E2761; }
+  .rel-arrow { color: #028090; font-weight: 900; font-size: 1rem; }
+  .rel-type { font-size: .72rem; background: #E0F7F4; color: #028090; padding: 2px 8px;
+    border-radius: 99px; font-weight: 600; }
+  .rel-to { font-size: .82rem; font-weight: 700; color: #1E2761; }
+
+  footer { text-align: center; padding: 24px; color: #94A3B8; font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>🛒 RevShop</h1>
+    <p>Application Architecture & Entity Relationship Diagram</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 1 — ARCHITECTURE
+  ═══════════════════════════════════════ -->
+  <div class="arch-section">
+    <h2 class="sec">Application Architecture — MVC Monolithic</h2>
+
+    <div class="arch-diagram">
+
+      <!-- Users -->
+      <div class="users-row">
+        <div class="user-box">👤 Buyer<span>Browses, shops, orders</span></div>
+        <div class="user-box">🏪 Seller<span>Lists products, manages orders</span></div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Frontend -->
+      <div class="layer l-frontend">
+        <div class="layer-title">🖥️ Frontend Layer — Thymeleaf Templates</div>
+        <div class="tags">
+          <span class="tag">index.html</span><span class="tag">login.html</span>
+          <span class="tag">register.html</span><span class="tag">cart.html</span>
+          <span class="tag">orders.html</span><span class="tag">product-detail.html</span>
+          <span class="tag">dashboard.html</span><span class="tag">favorites.html</span>
+          <span class="tag">notifications.html</span><span class="tag">CSS / JS</span>
+        </div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Controllers -->
+      <div class="layer l-controller">
+        <div class="layer-title">🎮 Controller Layer — Spring MVC REST Controllers</div>
+        <div class="tags">
+          <span class="tag">UserController</span><span class="tag">ProductController</span>
+          <span class="tag">CartController</span><span class="tag">OrderController</span>
+          <span class="tag">CategoryController</span><span class="tag">ReviewController</span>
+          <span class="tag">FavoriteController</span><span class="tag">NotificationController</span>
+          <span class="tag">SellerController</span><span class="tag">ImageController</span>
+        </div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- DTO -->
+      <div class="layer" style="background:#FEFCE8;border:2px solid #EAB308;max-width:800px;border-radius:14px;padding:12px 24px;width:100%;text-align:center;">
+        <div class="layer-title" style="color:#A16207;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">📦 DTO Layer — Data Transfer Objects (Request & Response)</div>
+        <div class="tags" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">UserRegistrationDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">UserResponseDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">ProductRequestDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">ProductResponseDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">OrderRequestDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">OrderResponseDTO</span>
+          <span class="tag" style="background:#FEF9C3;color:#A16207;">CartResponseDTO</span>
+        </div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Services -->
+      <div class="layer l-service">
+        <div class="layer-title">⚙️ Service Layer — Business Logic (Interface + Implementation)</div>
+        <div class="tags">
+          <span class="tag">UserService</span><span class="tag">ProductService</span>
+          <span class="tag">CartService</span><span class="tag">OrderService</span>
+          <span class="tag">ReviewService</span><span class="tag">FavoriteService</span>
+          <span class="tag">NotificationService</span><span class="tag">CategoryService</span>
+          <span class="tag">SellerService</span>
+        </div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- Repository -->
+      <div class="layer l-repo">
+        <div class="layer-title">🗃️ Repository Layer — Spring Data JPA</div>
+        <div class="tags">
+          <span class="tag">UserRepository</span><span class="tag">ProductRepository</span>
+          <span class="tag">CartRepository</span><span class="tag">OrderRepository</span>
+          <span class="tag">ReviewRepository</span><span class="tag">FavoriteRepository</span>
+          <span class="tag">NotificationRepository</span><span class="tag">PaymentRepository</span>
+        </div>
+      </div>
+
+      <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+      <!-- DB -->
+      <div class="layer l-db">
+        <div class="layer-title">🗄️ Database — Oracle XE (Port 1521) | JPA / Hibernate ORM</div>
+        <div class="tags">
+          <span class="tag">USERS</span><span class="tag">PRODUCTS</span>
+          <span class="tag">ORDERS</span><span class="tag">ORDER_ITEMS</span>
+          <span class="tag">CART</span><span class="tag">CART_ITEMS</span>
+          <span class="tag">REVIEWS</span><span class="tag">PAYMENTS</span>
+          <span class="tag">FAVORITES</span><span class="tag">NOTIFICATIONS</span>
+        </div>
+      </div>
+
+    </div><!-- /arch-diagram -->
+
+    <!-- Cross-cutting -->
+    <div style="margin-top:36px;">
+      <div style="text-align:center;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;margin-bottom:16px;">Cross-Cutting Concerns</div>
+      <div class="cross-row">
+        <div class="cross-box"><div class="cb-icon">🔐</div><div class="cb-title">Spring Security</div><div class="cb-sub">BCrypt · Role Auth · CSRF</div></div>
+        <div class="cross-box"><div class="cb-icon">📋</div><div class="cb-title">Log4J2 Logging</div><div class="cb-sub">log4j2-spring.xml</div></div>
+        <div class="cross-box"><div class="cb-icon">🚨</div><div class="cb-title">Exception Handling</div><div class="cb-sub">GlobalExceptionHandler</div></div>
+        <div class="cross-box"><div class="cb-icon">✅</div><div class="cb-title">JUnit 5 + Mockito</div><div class="cb-sub">9 Test Classes · 56 Tests</div></div>
+        <div class="cross-box"><div class="cb-icon">📦</div><div class="cb-title">Maven</div><div class="cb-sub">Dependency Management</div></div>
+      </div>
+    </div>
+
+  </div><!-- /arch-section -->
+
+
+  <!-- ═══════════════════════════════════════
+       SECTION 2 — ERD
+  ═══════════════════════════════════════ -->
+  <div class="erd-section">
+    <h2 class="sec">Entity Relationship Diagram (ERD)</h2>
+
+    <div class="erd-grid">
+
+      <!-- USERS -->
+      <div class="erd-table">
+        <div class="erd-header e-user">USERS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 user_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name">name</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">email</span><span class="col-type">VARCHAR UNIQUE</span></div>
+          <div class="erd-row"><span class="col-name">mobile_number</span><span class="col-type">BIGINT</span></div>
+          <div class="erd-row"><span class="col-name">password</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">role</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">business_name</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">address</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 security_question_id</span><span class="col-type">FK</span></div>
+          <div class="erd-row"><span class="col-name">security_answer</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="erd-table">
+        <div class="erd-header e-product">PRODUCTS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 product_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name">name</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">description</span><span class="col-type">TEXT</span></div>
+          <div class="erd-row"><span class="col-name">price</span><span class="col-type">DECIMAL</span></div>
+          <div class="erd-row"><span class="col-name">mrp</span><span class="col-type">DECIMAL</span></div>
+          <div class="erd-row"><span class="col-name">stock</span><span class="col-type">INTEGER</span></div>
+          <div class="erd-row"><span class="col-name">inventory_threshold</span><span class="col-type">INTEGER</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 seller_id</span><span class="col-type">FK → USERS</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 category_id</span><span class="col-type">FK → CATEGORIES</span></div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="erd-table">
+        <div class="erd-header e-category">CATEGORIES</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 category_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name">name</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+      <!-- CART -->
+      <div class="erd-table">
+        <div class="erd-header e-cart">CART</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 cart_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 user_id</span><span class="col-type">FK → USERS</span></div>
+        </div>
+      </div>
+
+      <!-- CART_ITEMS -->
+      <div class="erd-table">
+        <div class="erd-header e-cartitem">CART_ITEMS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 cart_item_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 cart_id</span><span class="col-type">FK → CART</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 product_id</span><span class="col-type">FK → PRODUCTS</span></div>
+          <div class="erd-row"><span class="col-name">quantity</span><span class="col-type">INTEGER</span></div>
+          <div class="erd-row"><span class="col-name">price</span><span class="col-type">DECIMAL</span></div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="erd-table">
+        <div class="erd-header e-order">ORDERS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 order_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 user_id</span><span class="col-type">FK → USERS</span></div>
+          <div class="erd-row"><span class="col-name">order_date</span><span class="col-type">TIMESTAMP</span></div>
+          <div class="erd-row"><span class="col-name">status</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">total_amount</span><span class="col-type">DECIMAL</span></div>
+          <div class="erd-row"><span class="col-name">shipping_name</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">shipping_address</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">shipping_pincode</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">payment_method</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+      <!-- ORDER_ITEMS -->
+      <div class="erd-table">
+        <div class="erd-header e-orderitem">ORDER_ITEMS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 order_item_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 order_id</span><span class="col-type">FK → ORDERS</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 product_id</span><span class="col-type">FK → PRODUCTS</span></div>
+          <div class="erd-row"><span class="col-name">quantity</span><span class="col-type">INTEGER</span></div>
+          <div class="erd-row"><span class="col-name">price</span><span class="col-type">DECIMAL</span></div>
+        </div>
+      </div>
+
+      <!-- PAYMENTS -->
+      <div class="erd-table">
+        <div class="erd-header e-payment">PAYMENTS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 payment_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 order_id</span><span class="col-type">FK → ORDERS</span></div>
+          <div class="erd-row"><span class="col-name">amount</span><span class="col-type">DECIMAL</span></div>
+          <div class="erd-row"><span class="col-name">payment_method</span><span class="col-type">VARCHAR</span></div>
+          <div class="erd-row"><span class="col-name">payment_date</span><span class="col-type">TIMESTAMP</span></div>
+          <div class="erd-row"><span class="col-name">status</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="erd-table">
+        <div class="erd-header e-review">REVIEWS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 review_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 user_id</span><span class="col-type">FK → USERS</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 product_id</span><span class="col-type">FK → PRODUCTS</span></div>
+          <div class="erd-row"><span class="col-name">rating</span><span class="col-type">INTEGER</span></div>
+          <div class="erd-row"><span class="col-name">comment</span><span class="col-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- FAVORITES -->
+      <div class="erd-table">
+        <div class="erd-header e-favorite">FAVORITES</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 favorite_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 user_id</span><span class="col-type">FK → USERS</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 product_id</span><span class="col-type">FK → PRODUCTS</span></div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="erd-table">
+        <div class="erd-header e-notif">NOTIFICATIONS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 notification_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 user_id</span><span class="col-type">FK → USERS</span></div>
+          <div class="erd-row"><span class="col-name">message</span><span class="col-type">TEXT</span></div>
+          <div class="erd-row"><span class="col-name">is_read</span><span class="col-type">BOOLEAN</span></div>
+          <div class="erd-row"><span class="col-name">created_at</span><span class="col-type">TIMESTAMP</span></div>
+        </div>
+      </div>
+
+      <!-- PRODUCT_IMAGES -->
+      <div class="erd-table">
+        <div class="erd-header e-prodimg">PRODUCT_IMAGES</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 image_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name fk">🔗 product_id</span><span class="col-type">FK → PRODUCTS</span></div>
+          <div class="erd-row"><span class="col-name">image_url</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+      <!-- SECURITY_QUESTIONS -->
+      <div class="erd-table">
+        <div class="erd-header e-secq">SECURITY_QUESTIONS</div>
+        <div class="erd-body">
+          <div class="erd-row"><span class="col-name pk">🔑 question_id</span><span class="col-type">BIGINT PK</span></div>
+          <div class="erd-row"><span class="col-name">question_text</span><span class="col-type">VARCHAR</span></div>
+        </div>
+      </div>
+
+    </div><!-- /erd-grid -->
+  </div><!-- /erd-section -->
+
+  <!-- RELATIONSHIPS -->
+  <div class="rel-section">
+    <h2 class="sec">Entity Relationships</h2>
+    <div class="rel-grid">
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-One</span><span class="rel-arrow">→</span><span class="rel-to">CART</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">ORDERS</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">REVIEWS</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">FAVORITES</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">NOTIFICATIONS</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">PRODUCTS (as Seller)</span></div>
+      <div class="rel-row"><span class="rel-entity">CART</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">CART_ITEMS</span></div>
+      <div class="rel-row"><span class="rel-entity">PRODUCTS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">CART_ITEMS</span></div>
+      <div class="rel-row"><span class="rel-entity">ORDERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">ORDER_ITEMS</span></div>
+      <div class="rel-row"><span class="rel-entity">ORDERS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-One</span><span class="rel-arrow">→</span><span class="rel-to">PAYMENTS</span></div>
+      <div class="rel-row"><span class="rel-entity">PRODUCTS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">ORDER_ITEMS</span></div>
+      <div class="rel-row"><span class="rel-entity">PRODUCTS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">REVIEWS</span></div>
+      <div class="rel-row"><span class="rel-entity">PRODUCTS</span><span class="rel-arrow">→</span><span class="rel-type">One-to-Many</span><span class="rel-arrow">→</span><span class="rel-to">PRODUCT_IMAGES</span></div>
+      <div class="rel-row"><span class="rel-entity">PRODUCTS</span><span class="rel-arrow">→</span><span class="rel-type">Many-to-One</span><span class="rel-arrow">→</span><span class="rel-to">CATEGORIES</span></div>
+      <div class="rel-row"><span class="rel-entity">USERS</span><span class="rel-arrow">→</span><span class="rel-type">Many-to-One</span><span class="rel-arrow">→</span><span class="rel-to">SECURITY_QUESTIONS</span></div>
+    </div>
+  </div>
+
+  <footer>RevShop — Spring Boot E-Commerce Application &nbsp;·&nbsp; Architecture & ERD Document</footer>
+
+</div>
+</body>
+</html>
